@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Ecran2 extends StatelessWidget {
-  const Ecran2({Key? key}) : super(key: key);
+  final String title;
+  const Ecran2({Key? key, required this.title}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,7 +10,7 @@ class Ecran2 extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
-              const Text("Ecran 2"),
+              Text(title),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
