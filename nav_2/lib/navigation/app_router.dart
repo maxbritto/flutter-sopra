@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:nav_2/data/user.dart';
 import 'package:nav_2/ecrans/login_screen.dart';
 import 'package:nav_2/ecrans/login_viewmodel.dart';
+import 'package:nav_2/ecrans/user_list_screen.dart';
+import 'package:nav_2/ecrans/user_list_viewmodel.dart';
 
 class AppRouteInfo {
   final bool isUserLoggedIn;
@@ -10,15 +13,37 @@ class AppRouteInfo {
 
 class AppRouter extends RouterDelegate<AppRouteInfo>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<AppRouteInfo>
-    implements RouteInformationParser<AppRouteInfo> {
+    implements RouteInformationParser<AppRouteInfo>, LoginRouter {
+  User? _userLoggedIn;
+
   @override
   Widget build(BuildContext context) {
     final pages = <Page>[];
-    pages.add(MaterialPage(child: LoginScreen(LoginViewModel())));
+    final user = _userLoggedIn;
+
+    pages.add(MaterialPage(child: LoginScreen(LoginViewModel(this))));
+    if (user != null) {
+      pages.add(
+          MaterialPage(child: UserListScreen(UserListViewModel(user: user))));
+    }
     return Navigator(
       pages: pages,
+      onPopPage: (route, result) {
+        if (!route.didPop(result)) {
+          return false;
+        }
+        if (_userLoggedIn != null) {
+          _userLoggedIn = null;
+        }
+
+        notifyListeners();
+        return true;
+      },
     );
   }
+
+  @override
+  AppRouteInfo? currentConfiguration = const AppRouteInfo();
 
   @override
   final GlobalKey<NavigatorState>? navigatorKey = GlobalKey<NavigatorState>();
@@ -37,5 +62,11 @@ class AppRouter extends RouterDelegate<AppRouteInfo>
   @override
   RouteInformation? restoreRouteInformation(configuration) {
     return const RouteInformation(location: "/");
+  }
+
+  @override
+  userDidLogin(User user) {
+    _userLoggedIn = user;
+    notifyListeners();
   }
 }

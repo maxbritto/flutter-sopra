@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:nav_2/navigation/app_router.dart';
+
+import '../data/user.dart';
+
+abstract class LoginRouter {
+  userDidLogin(User user);
+}
 
 class LoginViewModel extends ChangeNotifier {
+  final LoginRouter _router;
   String? _username;
   String? _password;
   String? _userMessage;
+
+  LoginViewModel(this._router);
 
   bool isLoading = false;
   String get userMessage => _userMessage ?? "";
@@ -35,6 +45,8 @@ class LoginViewModel extends ChangeNotifier {
       final loginSucceeded = await _checkCredentials(username, password);
       if (loginSucceeded) {
         _userMessage = "Bienvenue $username";
+
+        _router.userDidLogin(User(id: 1, name: username, email: username));
       } else {
         _userMessage = "Veuillez vérifier vos identifiants";
       }
@@ -45,6 +57,6 @@ class LoginViewModel extends ChangeNotifier {
 
   Future<bool> _checkCredentials(String username, String password) {
     return Future.delayed(
-        const Duration(seconds: 3), () => password.contains("ok"));
+        const Duration(seconds: 1), () => password.contains(""));
   }
 }
